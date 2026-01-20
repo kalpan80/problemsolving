@@ -1,0 +1,34 @@
+### **1. High-Risk Category (Score 8–10)**
+
+These rules identify transactions with clear indicators of illicit financial flow and intentional obfuscation.
+
+* **1.1 Illegal Sourcing:** Any transaction where `Source of Money` is **"Illegal"** and `Reported by Authority` is **"False"**.
+* **1.2 High Layering:** Any transaction involving **7 or more Shell Companies**, regardless of the industry.
+* **1.3 Extreme Jurisdictional Risk:** Transactions originating from high-risk countries (e.g., Russia, UAE) destined for **Tax Havens** (Cayman Islands, Bahamas, Panama) via **"Cryptocurrency"**.
+* **1.4 High-Value Illicit Activity:** Transactions exceeding **$4,000,000 USD** where the industry is **"Arms Trade"** or **"Casinos"** and the money is not reported.
+
+### **2. Medium-Risk Category (Score 4–7)**
+
+These rules identify transactions that require enhanced due diligence due to suspicious but non-conclusive patterns.
+
+* **2.1 Reported Illicit Funds:** Transactions where the `Source of Money` is **"Illegal"** but the activity has been **"Reported by Authority"**. The reporting acts as a slight mitigator, preventing a maximum score.
+* **2.2 Moderate Layering:** Transactions involving **3 to 6 Shell Companies** in industries like **"Real Estate"** or **"Construction"**.
+* **2.3 Complex Asset Movement:** Use of **"Offshore Transfers"** or **"Stocks Transfers"** involving at least one Tax Haven country, even if the source is "Legal."
+* **2.4 Sector-Specific Risk:** Transactions in **"Oil & Gas"** or **"Finance"** sectors that utilize 2 or more shell companies but lack a direct link to illegal sources.
+
+### **3. Low-Risk Category (Score 1–3)**
+
+These rules identify standard commercial activities with high transparency and low complexity.
+
+* **3.1 Clean & Transparent:** Transactions where the `Source of Money` is **"Legal"**, the `Reported by Authority` flag is **"True"**, and there are **0 Shell Companies**.
+* **3.2 Domestic/Regulated Movement:** Transactions with a **"Legal"** source involving **"Luxury Goods"** or **"Property Purchase"** between non-tax haven countries (e.g., USA to UK).
+* **3.3 Low Complexity Sourcing:** Any transaction where the number of shell companies is **below 2** and the transaction type is a standard **"Cash Withdrawal"** from a recognized financial institution.
+* **3.4 Minimum Risk Indicators:** Transactions that hit no red flags (Legal source, reported, no shell companies, no tax havens) are automatically assigned a baseline score of 1.
+
+### **Summary Rule Table**
+
+| Rule ID | Criteria | Risk Score Range |
+| --- | --- | --- |
+| **1.1 - 1.4** | Illegal Source + No Report + High Shell Count + Tax Haven | **8 - 10** |
+| **2.1 - 2.4** | Illegal (Reported) OR Legal + Moderate Shell Count | **4 - 7** |
+| **3.1 - 3.4** | Legal Source + Reported + 0-2 Shells + No Tax Haven | **1 - 3** |
