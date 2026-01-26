@@ -5,7 +5,7 @@ from agents import Runner
 
 from fastapi import FastAPI
 
-from detector_review import server_planning_agent, df, Transaction, black_money
+from aml_agents import server_planning_agent, df, Transaction, black_money
 
 # Create a FastAPI app instance
 app = FastAPI()
@@ -40,18 +40,26 @@ async def classify(record,acc_dict):
         transaction_data = result.final_output_as(Transaction)
         ground_truth = black_money[black_money['Transaction ID'] == transaction_data.transaction_id]['Money Laundering Risk Score'].item()
         if (ground_truth > 7 and transaction_data.risk_rating.lower() == 'high'):
-            acc_dict['valid'] += 1
+            acc_dict['TP'] += 1
         elif (ground_truth <= 7 and transaction_data.risk_rating.lower() == 'moderate' or transaction_data.risk_rating.lower() == 'low'):
-            acc_dict['valid'] += 1
+            acc_dict['TN'] += 1
         else:
             print('Mismatch ', transaction_data.risk_rating.lower(), ground_truth)
-            acc_dict['in_valid'] += 1
+            if (ground_truth > 7 and transaction_data.risk_rating.lower() == 'moderate' or transaction_data.risk_rating.lower() == 'low'):
+                acc_dict['FN'] += 1
+            else:
+                acc_dict['FP'] += 1
 
 @app.get('/classify_transactions')
 def classify_transactions():
     sample = df.sample(100).to_json(orient='records', index=False)
     records = json.loads(sample)
     acc_dict = {}
+    acc_dict['TP'] = 0
+    acc_dict['TN'] = 0
+    acc_dict['FP'] = 0
+    acc_dict['FN'] = 0
     for record in records:
         asyncio.run(classify(record,acc_dict))
+    print(acc_dict)
     return {"message": "Transaction classification is complete"}
