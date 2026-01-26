@@ -20,12 +20,8 @@ class Transaction(BaseModel):
     risk_rating: str
     justification: str
 
-acc_dict = {}
-acc_dict['valid'] = 0
-acc_dict['in_valid'] = 0
-
 black_money = pd.read_csv('Big_Black_Money_Dataset.csv')
-df = black_money.drop('Money Laundering Risk Score', axis=1)
+df = black_money.drop(['Money Laundering Risk Score','Financial Institution','Person Involved'], axis=1)
 
 rules = ''
 with open('Rules.txt', 'r') as f:
@@ -48,7 +44,7 @@ rule_agent_tool = Agent(
 
 @function_tool
 def read_data():
-    return df.sample(10).to_json()
+    return df.sample(10).to_json(orient='records',index=False)
 
 transaction_agent_tool = Agent(
         name="TransactionAgent",
