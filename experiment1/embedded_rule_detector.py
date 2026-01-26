@@ -24,7 +24,7 @@ black_money = pd.read_csv('Big_Black_Money_Dataset.csv')
 df = black_money.drop(['Money Laundering Risk Score','Financial Institution','Person Involved'], axis=1)
 
 def read_data():
-    return df.sample(50).to_json(orient='records',index=False)
+    return df.sample(1000).to_json(orient='records',index=False)
 
 
 import pandas as pd

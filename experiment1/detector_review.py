@@ -5,7 +5,7 @@ from pydantic import BaseModel
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', filename='aml.log')
 
 from dotenv import load_dotenv
-from agents import Agent, Runner, function_tool
+from agents import Agent, Runner, function_tool, AgentOutputSchemaBase, AgentOutputSchema
 import asyncio
 import json
 
@@ -95,7 +95,7 @@ processing_agent_tool = Agent(
     ).as_tool(tool_name='ProcessingAgentTool',
               tool_description='Agent that uses tools to process transactions')
 
-planning_agent = Agent(
+standalone_planning_agent = Agent(
         name="PlanningAgent",
         model=MODEL,
         instructions="You are a orchestrating agent that leverages sub-agents to detect anti money laundering transactions. You only need to use rules outlined to classify the transaction, do not apply any other knowledge."
@@ -110,9 +110,24 @@ planning_agent = Agent(
         tools=[rule_agent_tool,transaction_agent_tool,aml_agent_tool,aml_reviewer_agent_tool,alarm_agent_tool,processing_agent_tool]
 )
 
+server_planning_agent = Agent(
+        name="PlanningAgent",
+        model=MODEL,
+        instructions="You are a orchestrating agent that leverages sub-agents to detect anti money laundering transactions. You only need to use rules outlined to classify the transaction, do not apply any other knowledge."
+                     "Avoid any recommendations, follow-up questions or suggestions on the transactions. Ensure that all inter agent communication is in JSON format."
+                     "The RuleAgent contains the rules for flagging a transaction as high-risk, moderate-risk or low-risk."
+                     "The AMLAgent will evaluate the transaction, and provides justification for transaction rating. The justification should refer to the applied rules."
+                     "The AMLReviewerAgent will review the evaluation and justification provided."
+                     "The AlarmAgent will send out notifications if any transaction is flagged high-risk."
+                     "The ProcessingAgent will process the low-risk and moderate-risk transactions."
+                     "Provide justification for each processed transaction in JSON format.",
+        tools=[rule_agent_tool,aml_agent_tool,aml_reviewer_agent_tool,alarm_agent_tool,processing_agent_tool],
+        output_type=AgentOutputSchema(Transaction),
+)
+
 
 async def execute():
-    result = Runner.run_streamed(starting_agent=planning_agent,
+    result = Runner.run_streamed(starting_agent=standalone_planning_agent,
                                  input="Initiate the process to analyze transactions "
                                        "and invoke appropriate agents to proccess the data.",
                                  max_turns=50)
