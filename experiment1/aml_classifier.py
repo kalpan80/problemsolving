@@ -44,22 +44,25 @@ async def classify(record,acc_dict):
         elif (ground_truth <= 7 and transaction_data.risk_rating.lower() == 'moderate' or transaction_data.risk_rating.lower() == 'low'):
             acc_dict['TN'] += 1
         else:
-            print('Mismatch ', transaction_data.risk_rating.lower(), ground_truth)
             if (ground_truth > 7 and transaction_data.risk_rating.lower() == 'moderate' or transaction_data.risk_rating.lower() == 'low'):
                 acc_dict['FN'] += 1
             else:
                 acc_dict['FP'] += 1
+        return transaction_data
 
 @app.get('/classify_transactions')
 def classify_transactions():
-    sample = df.sample(100).to_json(orient='records', index=False)
+    sample = df.sample(10).to_json(orient='records', index=False)
     records = json.loads(sample)
     acc_dict = {}
     acc_dict['TP'] = 0
     acc_dict['TN'] = 0
     acc_dict['FP'] = 0
     acc_dict['FN'] = 0
+    batch_results = []
     for record in records:
-        asyncio.run(classify(record,acc_dict))
+        result = asyncio.run(classify(record, acc_dict))
+        if result is not None:
+            batch_results.append(result)
     print(acc_dict)
     return {"message": "Transaction classification is complete"}
